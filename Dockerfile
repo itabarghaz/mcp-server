@@ -11,6 +11,7 @@ ENV PATH="/root/.local/bin:$PATH"
 
 # Copy the dependency specification file
 COPY pyproject.toml ./
+COPY README.md ./
 
 # Install project dependencies using uv into the system environment
 # This leverages Docker layer caching - dependencies are only reinstalled if
