@@ -3,6 +3,7 @@ from typing import Any, List, Dict
 import re
 import os
 from mcp.server.fastmcp import FastMCP
+from mcp.transports.sse import SSETransport
 
 # Initialize FastMCP server
 mcp = FastMCP("mcp_server_test1")
@@ -69,6 +70,11 @@ async def search_words(query: str) -> str:
         return f"An error occurred while processing the PDF: {e}"
 
 if __name__ == "__main__":
-    # Initialize and run the server using SSE transport
-    # For the FastMCP implementation, we need to use only the transport parameter
-    mcp.run(transport='sse')
+    # Configure SSE transport with explicit host and port
+    transport = SSETransport(host="0.0.0.0", port=8080)
+    
+    # Initialize and run the server using the configured SSE transport
+    mcp.run(transport=transport)
+    
+    # Print startup message for debugging
+    print(f"MCP Server started with SSE transport on 0.0.0.0:8080")
