@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y curl && apt-get clean
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# Copy the dependency specification file
+# Copy project configuration and metadata files
 COPY pyproject.toml ./
+COPY README.md ./
 
 # Install project dependencies using uv into the system environment
 # This leverages Docker layer caching - dependencies are only reinstalled if
