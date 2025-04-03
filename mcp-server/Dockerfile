@@ -11,12 +11,11 @@ ENV PATH="/root/.local/bin:$PATH"
 
 # Copy project configuration and metadata files
 COPY pyproject.toml ./
-COPY README.md ./
+# COPY README.md ./ # No longer needed as we bypass the local build here
 
-# Install project dependencies using uv into the system environment
-# This leverages Docker layer caching - dependencies are only reinstalled if
-# pyproject.toml changes.
-RUN uv pip sync pyproject.toml --system --no-cache
+# Install only the external dependencies using uv pip install
+# This avoids triggering the hatchling build for the local package
+RUN uv pip install --system --no-cache "mcp[cli]>=1.6.0" "PyPDF2"
 
 # Copy the rest of the application code into the container
 COPY server.py ./
