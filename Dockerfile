@@ -12,8 +12,10 @@ ENV PATH="/root/.local/bin:$PATH"
 # Copy the dependency specification file
 COPY pyproject.toml ./
 
-# Install project dependencies using uv
-RUN uv pip sync pyproject.toml --no-cache
+# Install project dependencies using uv into the system environment
+# This leverages Docker layer caching - dependencies are only reinstalled if
+# pyproject.toml changes.
+RUN uv pip sync pyproject.toml --system --no-cache
 
 # Copy the rest of the application code into the container
 COPY server.py ./
