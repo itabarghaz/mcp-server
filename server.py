@@ -69,5 +69,6 @@ async def search_words(query: str) -> str:
         return f"An error occurred while processing the PDF: {e}"
 
 if __name__ == "__main__":
-    # Change from stdio to SSE
-    mcp.run(transport='sse', port=8080, host="0.0.0.0")
+    # Initialize and run the server using SSE transport
+    # For the FastMCP implementation, we need to use only the transport parameter
+    mcp.run(transport='sse')
