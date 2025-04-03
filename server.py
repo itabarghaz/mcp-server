@@ -12,8 +12,7 @@ async def search_words(query: str) -> str:
     Args:
         query: The text to search for within the PDF document.
     """
-    # Use relative path inside the container where Dockerfile copies the PDF
-    pdf_path = "mosip.pdf"
+    pdf_path = "/Users/tarikabarghaz/UM6P/AI_PROJECTS/mcp_server_test1/mosip.pdf"
     found_text = []
 
     try:
@@ -35,11 +34,10 @@ async def search_words(query: str) -> str:
         return "\n".join(found_text)
 
     except FileNotFoundError:
-        return f"Error: The file {pdf_path} was not found inside the container."
+        return f"Error: The file {pdf_path} was not found."
     except Exception as e:
         return f"An error occurred while processing the PDF: {e}"
 
 if __name__ == "__main__":
-    # Initialize and run the server using WebSocket transport
-    print("Starting MCP server on WebSocket ws://0.0.0.0:8080") # Added print for clarity
-    mcp.run(transport='websocket', host='0.0.0.0', port=8080)
+    # Initialize and run the server
+    mcp.run(transport='stdio')
