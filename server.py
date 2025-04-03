@@ -2,11 +2,15 @@ import PyPDF2
 from typing import Any, List, Dict
 import re
 import os
+import threading
 from mcp.server.fastmcp import FastMCP
-from mcp.transports.sse import SSETransport
+from flask import Flask, request, jsonify
 
 # Initialize FastMCP server
 mcp = FastMCP("mcp_server_test1")
+
+# Create Flask app for HTTP access
+app = Flask(__name__)
 
 @mcp.tool()
 async def search_words(query: str) -> str:
@@ -15,6 +19,10 @@ async def search_words(query: str) -> str:
     Args:
         query: The text to search for within the PDF document.
     """
+    return search_pdf(query)
+
+def search_pdf(query: str) -> str:
+    """Implementation of PDF search that can be used by both MCP and HTTP endpoints"""
     # Use container path instead of host path
     pdf_path = "/app/mosip.pdf"
     found_text = []
@@ -69,12 +77,31 @@ async def search_words(query: str) -> str:
     except Exception as e:
         return f"An error occurred while processing the PDF: {e}"
 
+# HTTP endpoint for search
+@app.route('/search', methods=['POST'])
+def http_search():
+    data = request.json
+    if not data or 'query' not in data:
+        return jsonify({"error": "Missing 'query' parameter"}), 400
+    
+    result = search_pdf(data['query'])
+    return jsonify({"result": result})
+
+# Function to run the MCP server in a separate thread
+def run_mcp_server():
+    print("Starting MCP Server with stdio transport")
+    mcp.run(transport='stdio')
+
+# Function to run the Flask server
+def run_flask_server():
+    print("Starting Flask HTTP server on port 8080")
+    app.run(host='0.0.0.0', port=8080)
+
 if __name__ == "__main__":
-    # Configure SSE transport with explicit host and port
-    transport = SSETransport(host="0.0.0.0", port=8080)
+    # Start the MCP server in a separate thread
+    mcp_thread = threading.Thread(target=run_mcp_server)
+    mcp_thread.daemon = True
+    mcp_thread.start()
     
-    # Initialize and run the server using the configured SSE transport
-    mcp.run(transport=transport)
-    
-    # Print startup message for debugging
-    print(f"MCP Server started with SSE transport on 0.0.0.0:8080")
+    # Run the Flask server in the main thread
+    run_flask_server()
