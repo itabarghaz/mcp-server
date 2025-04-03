@@ -69,5 +69,5 @@ async def search_words(query: str) -> str:
         return f"An error occurred while processing the PDF: {e}"
 
 if __name__ == "__main__":
-    # Initialize and run the server
-    mcp.run(transport='stdio')
+    # Change from stdio to SSE
+    mcp.run(transport='sse', port=8080, host="0.0.0.0")
